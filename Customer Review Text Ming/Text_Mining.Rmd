@@ -1,0 +1,78 @@
+---
+title: "Text Mining"
+author: "Nam Tran"
+date: "4/14/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr); library(tidyverse); library(dplyr); library(psych); library(PerformanceAnalytics); library(skimr); library(lessR); library(ggplot2); library(gridExtra); library(fastDummies); library(forecast); library(BMA); library(stats); library(olsrr); library(MASS); library(kableExtra); library(car); library(broom); library(glmulti); library(ggmap); library(rstudioapi); library(revgeo); library(RCurl);library(stringr); library(gsubfn);library(ngram);library(stringr); library(tm); library(caret); library(ROCR)
+```
+
+```{r}
+#Review_df <- read.csv("ReviewsNew.csv")
+Review_df <- read.csv("SentimentReview.csv")
+```
+
+```{r}
+colnames(Review_df)
+```
+
+
+```{r}
+Review_df$Location<- ifelse(str_detect((Review_df$comments),"near|location|located|far|close|distance|beach|walking|center")==TRUE,1,0)
+Review_df$Comfortable<- ifelse(str_detect((Review_df$comments),"Comfortable|comfortable|Convenient|convenient|conform|relax|satisfied|cozy|warm|peaceful|uncomfortable")==TRUE,1,0)
+Review_df$Space<- ifelse(str_detect((Review_df$comments),"space|spacious|large|small|huge|tiny")==TRUE,1,0)
+Review_df$Private<- ifelse(str_detect((Review_df$comments),"Private|private|quite|slient|noisy")==TRUE,1,0)
+Review_df$Beautiful<- ifelse(str_detect((Review_df$comments),"Beautiful|beautiful|cute|charming|appealing|elegant|lovely|pretty|good looking")==TRUE,1,0)
+Review_df$Cleaness<- ifelse(str_detect((Review_df$comments),"Clean|clean|cleaned|Dirty|dirty|organized|messy")==TRUE,1,0)
+
+```
+
+```{r}
+Review_df$Conversation<- ifelse(str_detect((Review_df$comments),"communicaion|conversation")==TRUE,1,0)
+table(Review_df$Conversation)
+
+```
+
+
+```{r}
+write.csv(Review_df,"ReviewSummary.csv", row.names = FALSE)
+```
+
+```{r}
+table_1<- Review_df %>%
+  summarise(
+    Total_review =n(),
+    Percentage_location = sum(Location)/Total_review*100,
+    Percentage_Comfortable = sum(Comfortable)/Total_review*100,
+    Percentage_Space = sum(Space)/Total_review*100,
+    Percentage_Private = sum(Private)/Total_review*100,
+    Percentage_Beautiful = sum(Beautiful)/Total_review*100,
+    Percentage_Cleaness = sum(Cleaness)/Total_review*100)
+
+(t(table_1)) %>%
+  knitr::kable(digits = 2)
+```
+
+```{r}
+table_2 <- Review_df %>%
+  group_by(host_is_superhost) %>%
+    summarise(
+      Total_review =n(),
+      Percentage_location = sum(Location)/Total_review*100,
+      Percentage_Comfortable = sum(Comfortable)/Total_review*100,
+      Percentage_Space = sum(Space)/Total_review*100,
+      Percentage_Private = sum(Private)/Total_review*100,
+      Percentage_Beautiful = sum(Beautiful)/Total_review*100,
+      Percentage_Cleaness = sum(Cleaness)/Total_review*100
+    )
+
+
+(t(table_2)) %>%
+  knitr::kable(digits = 2)
+```
+
+
+
